@@ -20,6 +20,39 @@
     </style>
 </head>
 <body>
-    <img src="main.jpeg" alt="Main Image">
+    <img id="randomImage" alt="Random Image">
+    <script>
+        async function loadRandomImage() {
+            try {
+                // Fetch the contents of the media folder from GitHub API
+                const response = await fetch('https://api.github.com/repos/enzoglt/enzoglt/contents/media');
+                const files = await response.json();
+                
+                // Filter for image files and get their download URLs
+                const imageUrls = files
+                    .filter(file => 
+                        file.name.toLowerCase().endsWith('.jpg') || 
+                        file.name.toLowerCase().endsWith('.jpeg') || 
+                        file.name.toLowerCase().endsWith('.png') || 
+                        file.name.toLowerCase().endsWith('.gif')
+                    )
+                    .map(file => file.download_url);
+                
+                if (imageUrls.length === 0) {
+                    throw new Error('No images found in media folder');
+                }
+                
+                // Select a random image
+                const randomIndex = Math.floor(Math.random() * imageUrls.length);
+                document.getElementById('randomImage').src = imageUrls[randomIndex];
+            } catch (error) {
+                console.error('Error loading random image:', error);
+                document.getElementById('randomImage').src = 'main.jpeg'; // Fallback image
+            }
+        }
+
+        // Load a random image when the page loads
+        loadRandomImage();
+    </script>
 </body>
 </html>
